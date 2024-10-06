@@ -1,170 +1,114 @@
 import cx from "clsx";
-import { useState } from "react";
-import { Table, ScrollArea, Box } from "@mantine/core";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Table,
+  ScrollArea,
+  Box,
+  Anchor,
+  Pill,
+  Group,
+  Badge,
+} from "@mantine/core";
 import classes from "./TableScrollArea.module.css";
+import axios from "axios";
 
-const data = [
-  {
-    name: "Athena Weissnat",
-    company: "Little - Rippin",
-    email: "Elouise.Prohaska@yahoo.com",
-  },
-  {
-    name: "Deangelo Runolfsson",
-    company: "Greenfelder - Krajcik",
-    email: "Kadin_Trantow87@yahoo.com",
-  },
-  {
-    name: "Danny Carter",
-    company: "Kohler and Sons",
-    email: "Marina3@hotmail.com",
-  },
-  {
-    name: "Trace Tremblay PhD",
-    company: "Crona, Aufderhar and Senger",
-    email: "Antonina.Pouros@yahoo.com",
-  },
-  {
-    name: "Derek Dibbert",
-    company: "Gottlieb LLC",
-    email: "Abagail29@hotmail.com",
-  },
-  {
-    name: "Viola Bernhard",
-    company: "Funk, Rohan and Kreiger",
-    email: "Jamie23@hotmail.com",
-  },
-  {
-    name: "Austin Jacobi",
-    company: "Botsford - Corwin",
-    email: "Genesis42@yahoo.com",
-  },
-  {
-    name: "Hershel Mosciski",
-    company: "Okuneva, Farrell and Kilback",
-    email: "Idella.Stehr28@yahoo.com",
-  },
-  {
-    name: "Mylene Ebert",
-    company: "Kirlin and Sons",
-    email: "Hildegard17@hotmail.com",
-  },
-  {
-    name: "Lou Trantow",
-    company: "Parisian - Lemke",
-    email: "Hillard.Barrows1@hotmail.com",
-  },
-  {
-    name: "Dariana Weimann",
-    company: "Schowalter - Donnelly",
-    email: "Colleen80@gmail.com",
-  },
-  {
-    name: "Dr. Christy Herman",
-    company: "VonRueden - Labadie",
-    email: "Lilyan98@gmail.com",
-  },
-  {
-    name: "Katelin Schuster",
-    company: "Jacobson - Smitham",
-    email: "Erich_Brekke76@gmail.com",
-  },
-  {
-    name: "Melyna Macejkovic",
-    company: "Schuster LLC",
-    email: "Kylee4@yahoo.com",
-  },
-  {
-    name: "Pinkie Rice",
-    company: "Wolf, Trantow and Zulauf",
-    email: "Fiona.Kutch@hotmail.com",
-  },
-  {
-    name: "Brain Kreiger",
-    company: "Lueilwitz Group",
-    email: "Rico98@hotmail.com",
-  },
-  {
-    name: "Myrtice McGlynn",
-    company: "Feest, Beahan and Johnston",
-    email: "Julius_Tremblay29@hotmail.com",
-  },
-  {
-    name: "Chester Carter PhD",
-    company: "Gaylord - Labadie",
-    email: "Jensen_McKenzie@hotmail.com",
-  },
-  {
-    name: "Mrs. Ericka Bahringer",
-    company: "Conn and Sons",
-    email: "Lisandro56@hotmail.com",
-  },
-  {
-    name: "Korbin Buckridge Sr.",
-    company: "Mraz, Rolfson and Predovic",
-    email: "Leatha9@yahoo.com",
-  },
-  {
-    name: "Dr. Daisy Becker",
-    company: "Carter - Mueller",
-    email: "Keaton_Sanford27@gmail.com",
-  },
-  {
-    name: "Derrick Buckridge Sr.",
-    company: "O'Reilly LLC",
-    email: "Kay83@yahoo.com",
-  },
-  {
-    name: "Ernie Hickle",
-    company: "Terry, O'Reilly and Farrell",
-    email: "Americo.Leffler89@gmail.com",
-  },
-  {
-    name: "Jewell Littel",
-    company: "O'Connell Group",
-    email: "Hester.Hettinger9@hotmail.com",
-  },
-  {
-    name: "Cyrus Howell",
-    company: "Windler, Yost and Fadel",
-    email: "Rick0@gmail.com",
-  },
-  {
-    name: "Dr. Orie Jast",
-    company: "Hilll - Pacocha",
-    email: "Anna56@hotmail.com",
-  },
-  {
-    name: "Luisa Murphy",
-    company: "Turner and Sons",
-    email: "Christine32@yahoo.com",
-  },
-  {
-    name: "Lea Witting",
-    company: "Hodkiewicz Inc",
-    email: "Ford_Kovacek4@yahoo.com",
-  },
-  {
-    name: "Kelli Runolfsson",
-    company: "Feest - O'Hara",
-    email: "Dimitri87@yahoo.com",
-  },
-  {
-    name: "Brook Gaylord",
-    company: "Conn, Huel and Nader",
-    email: "Immanuel77@gmail.com",
-  },
-];
+const initialData = []; // Start with an empty array for data
+const limit = 25; // Number of items per page
+let currentPage = 1; // Start at page 1
 
-export function TableScrollArea() {
+export function TableScrollArea({ records }) {
   const [scrolled, setScrolled] = useState(false);
+  const [data, setData] = useState(initialData);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
+  const viewport = useRef(null);
+
+  const fetchData = async (page) => {
+    if (loading || !hasMore) return; // Prevent multiple requests
+
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/card?limit=${limit}&page=${page}`
+      );
+      const newData = response.data.results; // Assuming the results come here
+
+      setData((prevData) => [...prevData, ...newData]);
+
+      if (response.data.totalPages !== currentPage) {
+        currentPage += 1; // Increment the page for next fetch
+      } else {
+        setHasMore(false); // No more data to load
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Check if we're near the bottom of the scroll area
+    setScrolled(true);
+    if (viewport.current) {
+      const { scrollHeight, clientHeight, scrollTop } = viewport.current;
+      if (scrollTop > 0) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+      if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore) {
+        fetchData(currentPage);
+      }
+    }
+  }, [scrollPosition]);
 
   const rows = data.map((row, index) => (
     <Table.Tr key={index + 1}>
       <Table.Td>{index + 1}</Table.Td>
-      <Table.Td>{row.name}</Table.Td>
-      <Table.Td>{row.email}</Table.Td>
-      <Table.Td>{row.company}</Table.Td>
+      <Table.Td>{row.question}</Table.Td>
+      <Table.Td>
+        <Anchor href={row.question_link} target="_blank">
+          {row.platform}
+        </Anchor>
+      </Table.Td>
+      <Table.Td>
+        <Badge
+          color={
+            row.difficulty === "easy"
+              ? "green"
+              : row.difficulty === "medium"
+              ? "yellow"
+              : "red"
+          }
+        >
+          {row.difficulty}
+        </Badge>
+      </Table.Td>
+      <Table.Td>
+        <Badge
+          color={
+            row.grade === "easy"
+              ? "green"
+              : row.grade === "good"
+              ? "yellow"
+              : row.grade === "hard"
+              ? "orange"
+              : "red"
+          }
+        >
+          {row.grade}
+        </Badge>
+      </Table.Td>
+      <Table.Td>
+        <Pill.Group>
+          {row.tags.map((tag, index) => (
+            <Pill key={index}>{tag}</Pill>
+          ))}
+        </Pill.Group>
+      </Table.Td>
     </Table.Tr>
   ));
 
@@ -172,18 +116,29 @@ export function TableScrollArea() {
     <Box style={{ padding: "20px 0", flex: 1, overflow: "hidden" }}>
       <ScrollArea
         style={{ height: "calc(100vh - 60px - 40px)", overflow: "auto" }}
-        onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+        onScrollPositionChange={onScrollPositionChange}
+        viewportRef={viewport}
+        // onScroll={handleScroll}
+        // ref={scrollAreaRef}
       >
-        <Box style={{ paddingBottom: "20px" }}>
+        <Box
+          style={{
+            paddingBottom: "20px",
+            paddingLeft: "20px",
+            paddingRight: "20px",
+          }}
+        >
           <Table miw={700}>
             <Table.Thead
               className={cx(classes.header, { [classes.scrolled]: scrolled })}
             >
               <Table.Tr>
                 <Table.Th>No.</Table.Th>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Email</Table.Th>
-                <Table.Th>Company</Table.Th>
+                <Table.Th>Question</Table.Th>
+                <Table.Th>Platform</Table.Th>
+                <Table.Th>Difficulty</Table.Th>
+                <Table.Th>Grade</Table.Th>
+                <Table.Th>Tags</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
