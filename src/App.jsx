@@ -1,17 +1,15 @@
 import { Box } from "@mantine/core";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { HeaderMegaMenu } from "./components/header/HeaderMegaMenu";
 import { TableScrollArea } from "./components/table/TableScrollArea";
 import { useState } from "react";
 import { FloatingButtonForm } from "./components/FloatingForm/FloatingButtonForm";
+import DueToday from "./components/DueToday/DueToday";
+import AllQuestions from "./components/AllQuestions/AllQuestions";
+import Pending from "./components/Pending/Pending";
 
 function App() {
-  const [records, setRecords] = useState([]);
-
-  const handleRecordAdded = (newRecord) => {
-    setRecords((prevRecords) => [...prevRecords, newRecord]);
-  };
-
   return (
     <Box
       style={{
@@ -21,9 +19,14 @@ function App() {
         overflow: "hidden",
       }}
     >
-      <HeaderMegaMenu />
-      <TableScrollArea records={records} />
-      <FloatingButtonForm onRecordAdded={handleRecordAdded} />
+      <Router>
+        <HeaderMegaMenu />
+        <Routes>
+          <Route path="/" element={<AllQuestions />} />
+          <Route path="/due-today" element={<DueToday />} />
+          <Route path="/pending" element={<Pending />} />
+        </Routes>
+      </Router>
     </Box>
   );
 }

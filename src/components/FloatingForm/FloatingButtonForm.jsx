@@ -23,7 +23,7 @@ const tagsOptions = [
   // Add more options as needed
 ];
 
-export function FloatingButtonForm({ onRecordAdded }) {
+export function FloatingButtonForm() {
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -58,7 +58,7 @@ export function FloatingButtonForm({ onRecordAdded }) {
       console.log("Payload: ", payload);
 
       const response = await axios.post("http://localhost:3000/card", payload);
-      onRecordAdded(response.data); // Call parent function to add new record
+      // onRecordAdded(response.data); // Call parent function to add new record
       setModalOpen(false); // Close the modal
       form.reset(); // Reset the form
     } catch (error) {
@@ -160,7 +160,7 @@ export function FloatingButtonForm({ onRecordAdded }) {
             <Button variant="outline" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" loading={loading}>
+            <Button type="submit">
               Submit
             </Button>
           </Group>

@@ -1,29 +1,50 @@
 import cx from "clsx";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   Table,
   ScrollArea,
   Box,
   Anchor,
   Pill,
-  Group,
   Badge,
+  ActionIcon,
 } from "@mantine/core";
 import classes from "./TableScrollArea.module.css";
 import axios from "axios";
+import { IconPlayerPlayFilled, IconEdit } from "@tabler/icons-react";
+import ModalWrapper from "../Modal/Modal";
+import { useDisclosure } from "@mantine/hooks";
+import { DeckCardForm } from "../DeckCardForm/DeckCardForm";
+import { DetailCard } from "../DetailCard/DetailCard";
 
 const initialData = []; // Start with an empty array for data
 const limit = 25; // Number of items per page
 let currentPage = 1; // Start at page 1
 
-export function TableScrollArea({ records }) {
+export function TableScrollArea({ status }) {
+  const [opened, { open, close }] = useDisclosure(false);
+
   const [scrolled, setScrolled] = useState(false);
   const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(currentPage);
+  const [card, setCard] = useState(null);
 
   const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
   const viewport = useRef(null);
+
+  const handleEdit = (row) => {
+    setCard(row);
+    open();
+  };
+
+  let baseurl = "http://localhost:3000/card";
+  if (status === "due") {
+    baseurl = "http://localhost:3000/card/duetoday";
+  } else if (status === "pending") {
+    baseurl = "http://localhost:3000/card/pending";
+  }
 
   const fetchData = async (page) => {
     if (loading || !hasMore) return; // Prevent multiple requests
@@ -31,14 +52,14 @@ export function TableScrollArea({ records }) {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:3000/card?limit=${limit}&page=${page}`
+        `${baseurl}?limit=${limit}&page=${page}`
       );
       const newData = response.data.results; // Assuming the results come here
 
       setData((prevData) => [...prevData, ...newData]);
-
-      if (response.data.totalPages !== currentPage) {
-        currentPage += 1; // Increment the page for next fetch
+      if (response.data.totalPages !== page) {
+        setPage(page + 1);
+        // currentPage += 1; // Increment the page for next fetch
       } else {
         setHasMore(false); // No more data to load
       }
@@ -48,6 +69,10 @@ export function TableScrollArea({ records }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   useEffect(() => {
     // Check if we're near the bottom of the scroll area
@@ -60,7 +85,7 @@ export function TableScrollArea({ records }) {
         setScrolled(false);
       }
       if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore) {
-        fetchData(currentPage);
+        fetchData(page);
       }
     }
   }, [scrollPosition]);
@@ -109,13 +134,30 @@ export function TableScrollArea({ records }) {
           ))}
         </Pill.Group>
       </Table.Td>
+      <Table.Td>
+        <ActionIcon
+          variant="filled"
+          aria-label="Settings"
+          onClick={() => handleEdit(row)}
+        >
+          {" "}
+          {status == "due" || status == "pending" ? (
+            <IconPlayerPlayFilled
+              style={{ width: "70%", height: "70%" }}
+              stroke={1.5}
+            />
+          ) : (
+            <IconEdit style={{ width: "70%", height: "70%" }} stroke={1.5} />
+          )}
+        </ActionIcon>
+      </Table.Td>
     </Table.Tr>
   ));
 
   return (
-    <Box style={{ padding: "20px 0", flex: 1, overflow: "hidden" }}>
+    <Fragment>
       <ScrollArea
-        style={{ height: "calc(100vh - 60px - 40px)", overflow: "auto" }}
+        style={{ height: "100%", overflowY: "auto" }}
         onScrollPositionChange={onScrollPositionChange}
         viewportRef={viewport}
         // onScroll={handleScroll}
@@ -123,9 +165,7 @@ export function TableScrollArea({ records }) {
       >
         <Box
           style={{
-            paddingBottom: "20px",
-            paddingLeft: "20px",
-            paddingRight: "20px",
+            padding: "20px",
           }}
         >
           <Table miw={700}>
@@ -139,12 +179,27 @@ export function TableScrollArea({ records }) {
                 <Table.Th>Difficulty</Table.Th>
                 <Table.Th>Grade</Table.Th>
                 <Table.Th>Tags</Table.Th>
+                <Table.Th>Actions</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
           </Table>
         </Box>
       </ScrollArea>
-    </Box>
+      {card && (
+        <ModalWrapper
+          opened={opened}
+          close={close}
+          title={card.question}
+          component={
+            status == "due" || status == "pending" ? (
+              <DetailCard card={card} />
+            ) : (
+              <DeckCardForm card={card} />
+            )
+          }
+        />
+      )}
+    </Fragment>
   );
 }

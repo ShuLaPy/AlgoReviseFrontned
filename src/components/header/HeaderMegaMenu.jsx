@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { MantineLogo } from "@mantinex/mantine-logo";
 import { useDisclosure } from "@mantine/hooks";
+import { Link } from "react-router-dom";
 import classes from "./HeaderMegaMenu.module.css";
 
 export function HeaderMegaMenu() {
@@ -22,11 +23,17 @@ export function HeaderMegaMenu() {
     <Box>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
-          <MantineLogo size={30} />
+          <Link to="/">
+            <MantineLogo size={30} />
+          </Link>
 
           <Group visibleFrom="sm">
-            <Button variant="default">Due Today</Button>
-            <Button>Pending Questions</Button>
+            <Link to="/due-today">
+              <Button variant="default">Due Today</Button>
+            </Link>
+            <Link to="/pending">
+              <Button>Pending Questions</Button>
+            </Link>
           </Group>
 
           <Burger
@@ -57,8 +64,12 @@ export function HeaderMegaMenu() {
               gap: "10px",
             }}
           >
-            <Button variant="default">Due Today</Button>
-            <Button>Pending Questions</Button>
+            <Link to="/due-today">
+              <Button variant="default">Due Today</Button>
+            </Link>
+            <Link to="/pending">
+              <Button>Pending Questions</Button>
+            </Link>
           </Box>
         </ScrollArea>
       </Drawer>
