@@ -41,7 +41,7 @@ export function DeckCardForm({ card, closeModal }) {
           question_link: "",
           platform: "",
           tags: [], // Multi-select for tags
-          resources: [], // Multi-select for resources
+          resources: "", // Multi-select for resources
           revision: false,
           difficulty: "easy", // Default value
           grade: "easy", // Default value
@@ -54,7 +54,7 @@ export function DeckCardForm({ card, closeModal }) {
     try {
       // Ensure resources are split into an array if comma-separated input is used
       const resourcesArray = values.resources
-        ?.split(",")
+        .split(",")
         .map((link) => link.trim())
         .filter(Boolean);
 

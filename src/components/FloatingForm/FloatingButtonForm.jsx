@@ -34,7 +34,7 @@ export function FloatingButtonForm() {
       question_link: "",
       platform: "",
       tags: [], // Multi-select for tags
-      resources: [], // Multi-select for resources
+      resources: "", // Multi-select for resources
       revision: false,
       difficulty: "easy", // Default value
       grade: "easy", // Default value
@@ -47,8 +47,9 @@ export function FloatingButtonForm() {
     setLoading(true);
     try {
       // Ensure resources are split into an array if comma-separated input is used
+      console.log(values.resources);
       const resourcesArray = values.resources
-        ?.split(",")
+        .split(",")
         .map((link) => link.trim())
         .filter(Boolean);
 
