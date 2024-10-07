@@ -20,7 +20,7 @@ const tagsOptions = [
   // Add more options as needed
 ];
 
-export function DeckCardForm({ card }) {
+export function DeckCardForm({ card, closeModal }) {
   const [loading, setLoading] = useState(false);
 
   let form = useForm({
@@ -74,7 +74,7 @@ export function DeckCardForm({ card }) {
         response = await axios.post("http://localhost:3000/card", payload);
       }
       // onRecordAdded(response.data); // Call parent function to add new record
-      setModalOpen(false); // Close the modal
+      closeModal() // Close the modal
       form.reset(); // Reset the form
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -157,7 +157,7 @@ export function DeckCardForm({ card }) {
       />
 
       <Group position="right" mt="md">
-        <Button variant="outline" onClick={() => setModalOpen(false)}>
+        <Button variant="outline" onClick={() => closeModal()}>
           Cancel
         </Button>
         <Button type="submit">Submit</Button>

@@ -195,9 +195,9 @@ export function TableScrollArea({ status }) {
           title={card.question}
           component={
             status == "due" || status == "pending" ? (
-              <DetailCard card={card} />
+              <DetailCard card={card} closeModal={close} />
             ) : (
-              <DeckCardForm card={card} />
+              <DeckCardForm card={card} closeModal={close} />
             )
           }
         />
