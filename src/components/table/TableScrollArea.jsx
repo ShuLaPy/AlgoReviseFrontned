@@ -71,10 +71,6 @@ export function TableScrollArea({ status }) {
   };
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  useEffect(() => {
     // Check if we're near the bottom of the scroll area
     setScrolled(true);
     if (viewport.current) {
