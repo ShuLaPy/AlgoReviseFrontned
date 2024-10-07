@@ -85,7 +85,9 @@ export function TableScrollArea({ status }) {
         setScrolled(false);
       }
       if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore) {
-        fetchData(page);
+        setTimeout(() => {
+          fetchData(page);
+        }, 50);
       }
     }
   }, [scrollPosition]);
