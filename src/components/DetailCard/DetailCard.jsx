@@ -18,33 +18,12 @@ import {
   IconPlayerPlay,
 } from "@tabler/icons-react";
 
-export const data = [
-  {
-    date: "Mar 22",
-    grade: 4,
-    ease_factor: 2.17,
-  },
-  {
-    date: "Mar 23",
-    grade: 3,
-    ease_factor: 2.37,
-  },
-  {
-    date: "Mar 24",
-    grade: 3,
-    ease_factor: 3,
-  },
-  {
-    date: "Mar 25",
-    grade: 2,
-    ease_factor: 3.3,
-  },
-  {
-    date: "Mar 26",
-    grade: 1,
-    ease_factor: 3.5,
-  },
-];
+const grade_enum = {
+  hard: 1,
+  again: 2,
+  good: 3,
+  easy: 4,
+};
 
 export function DetailCard({ card, closeModal }) {
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -53,6 +32,7 @@ export function DetailCard({ card, closeModal }) {
   const [isRunning, setIsRunning] = useState(false);
   const startTimeRef = useRef(null); // Store the reference to the start time
   const lastElapsedTimeRef = useRef(0);
+  const [progress, setProgress] = useState([]);
 
   const interval = useInterval(() => {
     if (timerStarted) {
@@ -124,6 +104,23 @@ export function DetailCard({ card, closeModal }) {
     interval.start();
   };
 
+  const getProgress = async () => {
+    let { data } = await axios.get(
+      `http://localhost:3000/history/progress/${card.id}`
+    );
+
+    data = data.map((data) => {
+      data.grade = grade_enum[data.grade];
+      return data;
+    });
+
+    setProgress(data);
+  };
+
+  useEffect(() => {
+    getProgress();
+  }, []);
+
   return (
     <>
       <LoadingOverlay visible={loading} />
@@ -163,11 +160,11 @@ export function DetailCard({ card, closeModal }) {
       </Group>
       <AreaChart
         h={200}
-        data={data}
+        data={progress}
         dataKey="date"
         series={[
-          { name: "grade", color: "teal.6" },
-          { name: "ease_factor", color: "red.6" },
+          { name: "time_taken", color: "teal.6" },
+          { name: "grade", color: "red.6" },
         ]}
         curveType="natural"
         withXAxis={false}

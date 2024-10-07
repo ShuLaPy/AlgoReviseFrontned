@@ -54,7 +54,7 @@ export function DeckCardForm({ card, closeModal }) {
     try {
       // Ensure resources are split into an array if comma-separated input is used
       const resourcesArray = values.resources
-        .split(",")
+        ?.split(",")
         .map((link) => link.trim())
         .filter(Boolean);
 
@@ -74,7 +74,7 @@ export function DeckCardForm({ card, closeModal }) {
         response = await axios.post("http://localhost:3000/card", payload);
       }
       // onRecordAdded(response.data); // Call parent function to add new record
-      closeModal() // Close the modal
+      closeModal(); // Close the modal
       form.reset(); // Reset the form
     } catch (error) {
       console.error("Error submitting form:", error);

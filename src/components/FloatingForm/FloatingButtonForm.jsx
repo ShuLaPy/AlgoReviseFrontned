@@ -11,6 +11,7 @@ import {
   Group,
   LoadingOverlay,
   MultiSelect,
+  NumberInput,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import axios from "axios";
@@ -38,6 +39,7 @@ export function FloatingButtonForm() {
       difficulty: "easy", // Default value
       grade: "easy", // Default value
       note: "",
+      last_time_taken: 0,
     },
   });
 
@@ -46,7 +48,7 @@ export function FloatingButtonForm() {
     try {
       // Ensure resources are split into an array if comma-separated input is used
       const resourcesArray = values.resources
-        .split(",")
+        ?.split(",")
         .map((link) => link.trim())
         .filter(Boolean);
 
@@ -105,6 +107,12 @@ export function FloatingButtonForm() {
             required
           />
 
+          <NumberInput
+            label="Time Taken"
+            {...form.getInputProps("last_time_taken")}
+            required
+          />
+
           <MultiSelect
             label="Tags"
             placeholder="Select tags"
@@ -160,9 +168,7 @@ export function FloatingButtonForm() {
             <Button variant="outline" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit">
-              Submit
-            </Button>
+            <Button type="submit">Submit</Button>
           </Group>
         </form>
       </Modal>
