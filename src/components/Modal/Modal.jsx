@@ -6,7 +6,8 @@ const ModalWrapper = ({ opened, close, component, title }) => {
       opened={opened}
       onClose={close}
       title={title}
-      withCloseButton={false}
+      closeOnClickOutside={false}
+      closeOnEscape={false}
       overlayProps={{
         backgroundOpacity: 0.55,
         blur: 3,
