@@ -17,6 +17,7 @@ import {
   IconPlayerPause,
   IconPlayerPlay,
 } from "@tabler/icons-react";
+import { VITE_API_URL } from "../../utils/config";
 
 const grade_enum = {
   hard: 1,
@@ -67,7 +68,7 @@ export function DetailCard({ card, closeModal }) {
       console.log("Payload: ", payload);
 
       const response = await axios.patch(
-        `http://localhost:3000/card/review/${card.id}`,
+        `${VITE_API_URL}/card/review/${card.id}`,
         payload
       );
 
@@ -106,7 +107,7 @@ export function DetailCard({ card, closeModal }) {
 
   const getProgress = async () => {
     let { data } = await axios.get(
-      `http://localhost:3000/history/progress/${card.id}`
+      `${VITE_API_URL}/history/progress/${card.id}`
     );
 
     data = data.map((data) => {

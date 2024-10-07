@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthProvider";
 import { useForm } from "@mantine/form";
 import axios from "axios";
+import { VITE_API_URL } from "../../utils/config";
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -35,7 +36,7 @@ export function LoginForm() {
       console.log("Payload: ", value);
 
       const response = await axios.post(
-        "http://localhost:3000/auth/login",
+        `${VITE_API_URL}/auth/login`,
         value
       );
       // onRecordAdded(response.data); // Call parent function to add new record

@@ -16,6 +16,7 @@ import {
 import { IconPlus } from "@tabler/icons-react";
 import axios from "axios";
 import { useForm } from "@mantine/form";
+import { VITE_API_URL } from "../../utils/config";
 
 const tagsOptions = [
   { value: "Binary Tree", label: "Binary Tree" },
@@ -60,7 +61,7 @@ export function FloatingButtonForm() {
 
       console.log("Payload: ", payload);
 
-      const response = await axios.post("http://localhost:3000/card", payload);
+      const response = await axios.post(`${VITE_API_URL}/card`, payload);
       // onRecordAdded(response.data); // Call parent function to add new record
       setModalOpen(false); // Close the modal
       form.reset(); // Reset the form

@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import axios from "axios";
 import { useForm } from "@mantine/form";
+import { VITE_API_URL } from "../../utils/config";
 
 const tagsOptions = [
   { value: "Binary Tree", label: "Binary Tree" },
@@ -67,11 +68,11 @@ export function DeckCardForm({ card, closeModal }) {
       let response;
       if (card) {
         response = await axios.patch(
-          `http://localhost:3000/card/${card.id}`,
+          `${VITE_API_URL}/card/${card.id}`,
           payload
         );
       } else {
-        response = await axios.post("http://localhost:3000/card", payload);
+        response = await axios.post(`${VITE_API_URL}/card`, payload);
       }
       // onRecordAdded(response.data); // Call parent function to add new record
       closeModal(); // Close the modal

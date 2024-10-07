@@ -16,6 +16,7 @@ import ModalWrapper from "../Modal/Modal";
 import { useDisclosure } from "@mantine/hooks";
 import { DeckCardForm } from "../DeckCardForm/DeckCardForm";
 import { DetailCard } from "../DetailCard/DetailCard";
+import { VITE_API_URL } from "../../utils/config";
 
 const initialData = []; // Start with an empty array for data
 const limit = 25; // Number of items per page
@@ -39,11 +40,11 @@ export function TableScrollArea({ status }) {
     open();
   };
 
-  let baseurl = "http://localhost:3000/card";
+  let baseurl = `${VITE_API_URL}/card`;
   if (status === "due") {
-    baseurl = "http://localhost:3000/card/duetoday";
+    baseurl = `${VITE_API_URL}/card/duetoday`;
   } else if (status === "pending") {
-    baseurl = "http://localhost:3000/card/pending";
+    baseurl = `${VITE_API_URL}/card/pending`;
   }
 
   const fetchData = async (page) => {
